@@ -11,7 +11,7 @@ namespace TempMonitor
         const string TEMP_COMMAND = "T";
         static SerialPort serialPort;
         static string readString;
-        const string FILE = "Temp.txt";
+        const string FILE = "C:\\Users\\Vinicius\\Dropbox\\Temp.txt";
 
         static void Main(string[] args)
         {
@@ -21,8 +21,11 @@ namespace TempMonitor
             while(true)
             {
                 readString = GetTemp();
-                WriteToFile(readString);
-                Thread.Sleep(5000)
+
+                if (!string.IsNullOrEmpty(readString))
+                    WriteToFile(readString);
+
+                Thread.Sleep(10000);
             }
         }
 
