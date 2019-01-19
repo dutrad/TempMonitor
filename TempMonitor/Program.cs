@@ -5,44 +5,72 @@ using System.IO;
 
 namespace TempMonitor
 {
-    class Program
+    public class Program
     {
         const string PORT = "COM4";
         const string TEMP_COMMAND = "T";
         static SerialPort serialPort;
-        static string readString;
         const string FILE = "C:\\Users\\Vinicius\\Dropbox\\Temp.txt";
+        const float alpha = 0.8f;
+        static float lastTemp;
+        static float currTemp;
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            serialPort = new SerialPort(PORT, 9600);
-            serialPort.Open();
-
+            try {
+                serialPort = new SerialPort(PORT, 9600);
+                serialPort.Open();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Error opening port: " + e.Message);
+                Console.ReadLine();
+                return;
+            }
+            
+            lastTemp = GetTemp();
             while(true)
             {
-                readString = GetTemp();
+                currTemp = GetTemp();
+                lastTemp = LowPassFilter();
 
-                if (!string.IsNullOrEmpty(readString))
-                    WriteToFile(readString);
+                if (currTemp >= 0 || lastTemp >= 0)
+                    WriteToFile(currTemp.ToString("0.##"), lastTemp.ToString("0.##"));
 
                 Thread.Sleep(10000);
             }
         }
 
-        static string GetTemp()
+        public static float GetTemp()
         {
-            serialPort.Write(TEMP_COMMAND);
-            return serialPort.ReadLine();
+            float returnTemp;
+            try {
+                serialPort.Write(TEMP_COMMAND);
+                returnTemp = float.Parse(serialPort.ReadLine());
+            }
+            catch(Exception)
+            {
+                return -1;
+            }
+            return returnTemp;
         }
 
-        static void WriteToFile(string temp)
+        public static void WriteToFile(string readTemp , string filtTemp)
         {
             try {
                 StreamWriter stream = new StreamWriter(FILE, true);
-                stream.WriteLine(temp.Trim() + "\t" + DateTime.Now);
+                stream.WriteLine(readTemp.Trim() + "\t" + filtTemp.Trim() + "\t" + DateTime.Now);
                 stream.Close();
             }
             catch (Exception) { }
+        }
+
+        static float LowPassFilter()
+        {
+            if (currTemp < 0 || lastTemp < 0)
+                return currTemp;
+
+            return alpha * currTemp + (1 - alpha) * lastTemp;
         }
     }
 }
