@@ -5,9 +5,9 @@ using System.IO;
 
 namespace TempMonitor
 {
-    public class Program
+    class Program
     {
-        const string PORT = "COM4";
+        const string PORT = "COM3";
         const string TEMP_COMMAND = "T";
         static SerialPort serialPort;
         const string FILE = "C:\\Users\\Vinicius\\Dropbox\\Temp.txt";
@@ -15,7 +15,7 @@ namespace TempMonitor
         static float lastTemp;
         static float currTemp;
 
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
             try {
                 serialPort = new SerialPort(PORT, 9600);
@@ -37,11 +37,11 @@ namespace TempMonitor
                 if (currTemp >= 0 || lastTemp >= 0)
                     WriteToFile(currTemp.ToString("0.##"), lastTemp.ToString("0.##"));
 
-                Thread.Sleep(10000);
+                Thread.Sleep(30000);
             }
         }
 
-        public static float GetTemp()
+        static float GetTemp()
         {
             float returnTemp;
             try {
@@ -55,7 +55,7 @@ namespace TempMonitor
             return returnTemp;
         }
 
-        public static void WriteToFile(string readTemp , string filtTemp)
+        static void WriteToFile(string readTemp , string filtTemp)
         {
             try {
                 StreamWriter stream = new StreamWriter(FILE, true);
