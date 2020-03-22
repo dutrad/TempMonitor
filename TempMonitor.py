@@ -1,6 +1,7 @@
 import glob
 import sys
 import time
+import urllib.parse, urllib.request
 
 import serial
 
@@ -34,19 +35,24 @@ def serial_ports():
     return ""
 
 
-sport: str = serial_ports()
-if sport:
-    print(sport + ' will be used')
+s_port: str = serial_ports()
+if s_port:
+    print(s_port + ' will be used')
 else:
     print('No serial port found')
     exit()
 
-s = serial.Serial(sport, 9600, timeout=1)
+s = serial.Serial(s_port, 9600, timeout=1)
+apiKey: str = '1VP9BWGNWA91KDHU'
 
 while True:
     s.write(b'T')
     res = s.readline()
     if res:
-        value = float(res)
-        print(value)
-    time.sleep(1)
+        temp = float(res)
+        print(temp)
+
+        params = urllib.parse.urlencode({'key': apiKey, 'field1': temp}).encode('ascii')
+        f = urllib.request.urlopen("https://api.thingspeak.com/update", data=params)
+
+    time.sleep(60)
