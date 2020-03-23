@@ -1,12 +1,13 @@
 import glob
 import sys
 import time
-import urllib.parse, urllib.request
+import urllib.parse
+import urllib.request
 
-import serial
+from serial import Serial, SerialException
 
 
-def serial_ports():
+def serial_ports() -> str:
     """ Find serial port
 
         :raises EnvironmentError:
@@ -26,10 +27,10 @@ def serial_ports():
 
     for port in ports:
         try:
-            se = serial.Serial(port)
+            se = Serial(port)
             se.close()
             return port
-        except (OSError, serial.SerialException):
+        except (OSError, SerialException):
             pass
 
     return ""
@@ -42,11 +43,10 @@ else:
     print('No serial port found')
     exit()
 
-s = serial.Serial(s_port, 9600, timeout=1)
+s = Serial(s_port, 9600, timeout=1)
 apiKey: str = '1VP9BWGNWA91KDHU'
 
 while True:
-    s.write(b'T')
     res = s.readline()
     if res:
         temp = float(res)
@@ -55,4 +55,4 @@ while True:
         params = urllib.parse.urlencode({'key': apiKey, 'field1': temp}).encode('ascii')
         f = urllib.request.urlopen("https://api.thingspeak.com/update", data=params)
 
-    time.sleep(300)
+    time.sleep(10)
