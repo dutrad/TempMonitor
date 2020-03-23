@@ -1,22 +1,12 @@
-/*
- * FirmWare for Control Lab
-  May 2018
-  Oct 2019
-  Vinicius Dutra Dias
-*/
+#include "Low-Power/LowPower.h"
 
 //constants
 const int pinT1 = 0;
 const int pinT2 = 2;
-const int pinQ1 = 3;
-const int pinQ2 = 5;
-const int pinLed = 9;
+const int baudRate = 9600;
 const float analogTomV = 3300.0/1024.0; // Reference of 3.3V divided by 10 bit read (2^10)
+const int sleep_reps = 75;
 
-const String firmVersion = "1.2";   //Firmware version
-const int baudRate = 9600;          //Serial baud rate
-const char separator = ' ';         //Command separator
-const char endOfCmd = '\n';         //Command terminator
 const int n = 10;                   //Samples for tempeterature reading
 
 //global variables
@@ -34,67 +24,11 @@ void setup() {
 }
 
 void loop() {
-  readCmd();
-  parseCmd();
-  execCmd();
+  Serial.println((getTemp(pinT1) + getTemp(pinT2))/2);
   Serial.flush();
-}
 
-void readCmd(){
-  //Parse command from serial input
-  Serial.readBytesUntil(endOfCmd, bufferIn, sizeof(bufferIn));
-}
-
-void parseCmd(){
-  //Get command
-  data = String(bufferIn);
-  int pos = data.indexOf(separator); 
-  cmd  = data.substring(0, pos);
-  cmd.trim();
-  cmd.toUpperCase();
-
-  //Get command value
-  data =  data.substring(pos);
-  data.trim();
-  value = data.toFloat();
-
-  //Clear buffer
-  memset(bufferIn, 0, sizeof(bufferIn));
-}
-
-void execCmd(){
-  //Commands
-  if(cmd == "T1")
-    Serial.println(getTemp(pinT1));
-
-  else if(cmd == "T2")
-    Serial.println(getTemp(pinT2));
-    
-  else if(cmd == "T")
-    Serial.println((getTemp(pinT1) + getTemp(pinT2))/2);
-    
-  else if (cmd == "V")
-    Serial.println("My Firmware Version " + firmVersion);
-    
-  else if(cmd == "Q1"){
-    checkValue(); 
-    
-    analogWrite(pinQ1, iWrite);
-    Serial.println(value);
-  }
-
-  else if(cmd == "Q2"){
-    checkValue(); 
-    
-    analogWrite(pinQ2, iWrite);
-    Serial.println(value);
-  }
-  else if(cmd == "L"){
-    checkValue();
-
-    analogWrite(pinLed, iWrite);
-    Serial.println(value);
-  }
+  for(int i = 0; i<sleep_reps; ++i)
+    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
 }
 
 float getTemp(int pin)
@@ -107,12 +41,4 @@ float getTemp(int pin)
     temp = temp + (mV-500.0)/10.0; //mV to degrees Celsius
   }
     return temp/float(n);
-}
-
-void checkValue(){
-  //Value between 100 and 0
-  value = max(0, min(100, value));
-
-  iWrite = int(value*2.55);
-  iWrite = min(iWrite, 255);
 }
