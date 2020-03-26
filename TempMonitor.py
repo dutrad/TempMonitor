@@ -56,4 +56,4 @@ while True:
         params = urllib.parse.urlencode({'key': apiKey, 'field1': temp}).encode('ascii')
         f = urllib.request.urlopen("https://api.thingspeak.com/update", data=params)
 
-    time.sleep(1)
+        time.sleep(1200)
