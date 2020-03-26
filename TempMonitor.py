@@ -47,6 +47,7 @@ s = Serial(s_port, 9600, timeout=1)
 apiKey: str = '1VP9BWGNWA91KDHU'
 
 while True:
+    s.write(b'T')
     res = s.readline()
     if res:
         temp = float(res)
@@ -55,4 +56,4 @@ while True:
         params = urllib.parse.urlencode({'key': apiKey, 'field1': temp}).encode('ascii')
         f = urllib.request.urlopen("https://api.thingspeak.com/update", data=params)
 
-    time.sleep(10)
+    time.sleep(1)
