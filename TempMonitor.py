@@ -53,7 +53,12 @@ while True:
         temp = float(res)
         print(temp)
 
-        params = urllib.parse.urlencode({'key': apiKey, 'field1': temp}).encode('ascii')
-        f = urllib.request.urlopen("https://api.thingspeak.com/update", data=params)
+        try:
+            params = urllib.parse.urlencode({'key': apiKey, 'field1': temp}).encode('ascii')
+            f = urllib.request.urlopen("https://api.thingspeak.com/update", data=params)
 
-        time.sleep(1200)
+            time.sleep(1200)
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            print('Error sending temperature to Thingspeak')
