@@ -1,6 +1,6 @@
 import glob
 import sys
-import time
+import time as t
 import urllib.parse
 import urllib.request
 
@@ -37,11 +37,12 @@ def serial_ports() -> str:
 
 
 s_port: str = serial_ports()
-if s_port:
-    print(s_port + ' will be used')
-else:
+while s_port == "":
+    t.sleep(5)
     print('No serial port found')
-    exit()
+    s_port = serial_ports()
+
+print(s_port + ' will be used')
 
 s = Serial(s_port, 9600, timeout=1)
 apiKey: str = '1VP9BWGNWA91KDHU'
@@ -57,7 +58,7 @@ while True:
             params = urllib.parse.urlencode({'key': apiKey, 'field1': temp}).encode('ascii')
             f = urllib.request.urlopen("https://api.thingspeak.com/update", data=params)
 
-            time.sleep(1200)
+            t.sleep(300)
         except (KeyboardInterrupt, SystemExit):
             raise
         except:
