@@ -61,5 +61,7 @@ while True:
             t.sleep(30)
         except (KeyboardInterrupt, SystemExit):
             raise
+        except (OSError, SerialException):
+            pass
         except:
             print('Error sending temperature to Thingspeak')
