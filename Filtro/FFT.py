@@ -1,39 +1,65 @@
 import numpy as np
-from scipy.fft import fft
-from scipy import signal
 import matplotlib.pyplot as plt
+from scipy.fftpack import fft, ifft
 import pandas as pd
 
 y = pd.read_csv('feeds.csv', usecols=['field1'])
-y = np.array(y[100:len(y)], dtype=np.float)
+y = np.array(y[len(y)//2:], dtype=np.float)
 # Number of sample points
 N = len(y)
 
 # sample spacing
 T = 30
-x = np.linspace(0.0, N * T, N)
+f = 1/T
+x = np.linspace(0.0, N*T/60, N)
+
+# FFT
 yf = fft(y)
-xf = np.linspace(0.0, 1.0 / (2.0 * T), N // 2)
+xf = np.linspace(0.0, f/2, N//2)
 
-# Filter
-b, a = signal.butter(3, 0.008, 'low')
-y_filter = signal.filtfilt(b, a, y, padlen=0)
-yf_filter = fft(y_filter)
+# Moving Average
+alfa = 0.9
+ym = np.empty([N,1])
+ym[0] = y[0]
+ym[1] = y[1]
+for i in range(2,N):
+    ym[i] = (y[i] + y[i-1] + y[i-2])/3
 
-# Plot
-plt.figure(1)
-plt.plot(xf, 2.0 / N * np.abs(yf[0:N // 2]), 'k-', label='Signal')
-plt.plot(xf, 2.0 / N * np.abs(yf_filter[0:N // 2]),  'b-', label='Filtered')
+ymf = fft(ym)
+
+
+fig1 = plt.figure()
+
+plt.subplot(2, 2, 1)
+plt.title('Temperatura')
+plt.plot(x,y)
+plt.xlabel('Tempo (min)')
+plt.ylabel('T (ºC)')
 plt.grid()
-plt.legend(loc='best')
-plt.xlabel('Hz')
-plt.ylabel('|Y|')
 
-plt.figure(2)
-plt.plot(np.array(y, dtype=np.float), 'k-', label='Signal')
-plt.plot(y_filter, 'b-', label='Filtered')
-plt.legend(loc='best')
+plt.subplot(2, 2, 2)
+plt.plot(xf, 1.0/N * np.abs(yf[:N//2]))
+plt.title('FFT')
+plt.xlabel('Freq (Hz)')
+plt.ylabel('|T|')
 plt.grid()
-plt.ylabel('Temperature (ºC)')
+
+plt.subplot(2, 2, 3)
+plt.title('Temperatura -  MV')
+plt.plot(x,ym)
+plt.xlabel('Tempo (min)')
+plt.ylabel('T (ºC)')
+plt.grid()
+
+plt.subplot(2, 2, 4)
+plt.plot(xf, 1.0/N * np.abs(ymf[:N//2]))
+plt.title('FFT - MV')
+plt.xlabel('Freq (Hz)')
+plt.ylabel('|T|')
+plt.grid()
 
 plt.show()
+
+
+
+

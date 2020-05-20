@@ -220,3 +220,5 @@ project.lock.json
 ## Arduino build
 *.elf
 *.hex
+
+*FFT_Study
