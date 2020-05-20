@@ -6,18 +6,19 @@ from serial import Serial, SerialException
 from serialPort import serial_ports
 
 def firstTemps(serialp):
-    y0,y1 = 0.0
-    
+    y0 = 0.0
+    y1 = 0.0
+
     while True:
        serialp.write(b'T')
        line = serialp.readline()
 
        if line:
            if y0 == 0.0:
-              y0 = float(res)
-              print(t0)
-              y1 = float(res)
-              print(t1)
+              y0 = float(line)
+              print(y0)
+              y1 = float(line)
+              print(y1)
               return [y0,y1]
 
 s_port: str = serial_ports()
