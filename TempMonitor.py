@@ -5,20 +5,20 @@ import urllib.request
 from serial import Serial, SerialException
 from serialPort import serial_ports
 
-def firstTemps(serialP):
-    t0,t1 = 0.0
+def firstTemps(serialp):
+    y0,y1 = 0.0
+    
     while True:
-       serialP.write(b'T')
-       res = serialP.readline()
-      
-       if res:
-           if t0 == 0.0
-              t0 = float(res)
+       serialp.write(b'T')
+       line = serialp.readline()
+
+       if line:
+           if y0 == 0.0:
+              y0 = float(res)
               print(t0)
-           else
-              t1 = float(res)
+              y1 = float(res)
               print(t1)
-              return [t0,t1]
+              return [y0,y1]
 
 s_port: str = serial_ports()
 while s_port == "":
