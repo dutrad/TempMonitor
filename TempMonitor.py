@@ -1,39 +1,9 @@
-import glob
-import sys
 import time as t
 import urllib.parse
 import urllib.request
 
 from serial import Serial, SerialException
-
-
-def serial_ports() -> str:
-    """ Find serial port
-
-        :raises EnvironmentError:
-            On unsupported or unknown platforms
-        :returns:
-            A list of the serial ports available on the system
-    """
-    if sys.platform.startswith('win'):
-        ports = ['COM%s' % (i + 1) for i in range(256)]
-    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-        # this excludes your current terminal "/dev/tty"
-        ports = glob.glob('/dev/tty[A-Za-z]*')
-    elif sys.platform.startswith('darwin'):
-        ports = glob.glob('/dev/tty.*')
-    else:
-        raise EnvironmentError('Unsupported platform')
-
-    for port in ports:
-        try:
-            se = Serial(port)
-            se.close()
-            return port
-        except (OSError, SerialException):
-            pass
-
-    return ""
+from serialPort import serial_ports
 
 
 s_port: str = serial_ports()
