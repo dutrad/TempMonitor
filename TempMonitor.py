@@ -43,9 +43,9 @@ while True:
 
         t0 = t1
         t1 = temp
-
+        
         try:
-            params = urllib.parse.urlencode({'key': apiKey, 'field1': temp}).encode('ascii')
+            params = urllib.parse.urlencode({'key': apiKey, 'field1': round(temp,1)}).encode('ascii')
             f = urllib.request.urlopen("https://api.thingspeak.com/update", data=params)
 
             t.sleep(30)
