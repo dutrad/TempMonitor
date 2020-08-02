@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.fftpack import fft, ifft
+from scipy.fftpack import fft, ifft 
+from scipy.signal import butter, filtfilt
 import pandas as pd
 
 y = pd.read_csv('feeds.csv', usecols=['field1'])
-y = np.array(y[len(y)//2:], dtype=np.float)
+y = np.array(y, dtype=np.float)
 # Number of sample points
 N = len(y)
 
@@ -18,7 +19,7 @@ yf = fft(y)
 xf = np.linspace(0.0, f/2, N//2)
 
 # Moving Average
-alfa = np.array([0.4, 0.3, 0.3])
+alfa = np.array([0.01, 0.04, 0.95])
 ym = np.empty([N,1])
 ord = 2
 
@@ -29,14 +30,23 @@ for i in range(2,N):
     y_ar = np.array([y[i], ym[i-1], ym[i-2]])
     ym[i] = alfa.dot(y_ar)
 
-ymf = fft(ym)
+cut_off = 0.001
+w = cut_off/(f/2)
+b, a = butter(1, w, 'low')
+print(w)
+print(b,a)
 
+#ym = filtfilt(b,a,ym)
+
+ymf = fft(ym)
+y_diff = y-ym
 
 fig1 = plt.figure()
 
 plt.subplot(2, 2, 1)
 plt.title('Temperatura')
 plt.plot(x,y)
+plt.plot(x,ym)
 plt.xlabel('Tempo (min)')
 plt.ylabel('T (ºC)')
 plt.grid()
@@ -50,7 +60,7 @@ plt.grid()
 
 plt.subplot(2, 2, 3)
 plt.title('Temperatura -  MV')
-plt.plot(x,ym)
+plt.plot(x,y_diff)
 plt.xlabel('Tempo (min)')
 plt.ylabel('T (ºC)')
 plt.grid()
