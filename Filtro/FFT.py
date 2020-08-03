@@ -5,7 +5,7 @@ from scipy.signal import butter, filtfilt
 import pandas as pd
 
 y = pd.read_csv('feeds.csv', usecols=['field1'])
-y = np.array(y, dtype=np.float)
+y = np.array(y[len(y)//2:], dtype=np.float)
 # Number of sample points
 N = len(y)
 
@@ -19,7 +19,7 @@ yf = fft(y)
 xf = np.linspace(0.0, f/2, N//2)
 
 # Moving Average
-alfa = np.array([0.01, 0.04, 0.95])
+alfa = np.array([0.011, 0.144, 0.845])
 ym = np.empty([N,1])
 ord = 2
 
@@ -33,7 +33,7 @@ for i in range(2,N):
 cut_off = 0.001
 w = cut_off/(f/2)
 b, a = butter(1, w, 'low')
-print(w)
+print(w, f)
 print(b,a)
 
 #ym = filtfilt(b,a,ym)
