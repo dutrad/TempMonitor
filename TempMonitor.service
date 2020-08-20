@@ -1,0 +1,9 @@
+[Unit]
+Description=Python script that reads the current temperature and sends it to ThingSpeak
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3.7 /home/pi/Documents/TempMonitor/TempMonitor.py
+
+[Install]
+WantedBy=multi-user.target
