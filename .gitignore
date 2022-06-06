@@ -222,3 +222,4 @@ project.lock.json
 *.hex
 
 *FFT_Study
+lastTemp.json
